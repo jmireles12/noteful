@@ -5,22 +5,20 @@ import NoteListNav from './NoteListNav/NoteListNav';
 import NotePageNav from './NotePageNav/NotePageNav';
 import NoteListMain from './NoteListMain/NoteListMain';
 import NotePageMain from './NotePageMain/NotePageMain';
+import {Context} from './context';
 import Store from './Store';
 import {getNotesForFolder, findNote, findFolder} from './notes-helpers';
 import './App.css';
 
 class App extends Component {
-  state = {
-    notes: [],
-    folders: []
-  };
+  static contextType = Context;
 
   componentDidMount() {
     setTimeout(() => this.setState(Store), 600);
   }
 
   renderNavRoutes() {
-    const {notes, folders} = this.state;
+    const {notes, folders} = this.context;
     return (
       <div>
         {['/', '/folder/:folderId'].map(path => (
@@ -53,7 +51,7 @@ class App extends Component {
   }
 
   renderMainRoutes() {
-    const {notes} = this.state;
+    const {notes} = this.context;
     return (
       <div>
         {['/', '/folder/:folderId'].map(path => (
@@ -90,6 +88,7 @@ class App extends Component {
 
   render() {
     return (
+      <Context.Provider>
     <div className="App">
       <nav className='App__nav'>{this.renderNavRoutes()}</nav>
       <header className='App__header'>
@@ -100,6 +99,7 @@ class App extends Component {
       </header>
       <main className='App__main'>{this.renderMainRoutes()}</main>
     </div>
+    </Context.Provider>
     );
   }
 }

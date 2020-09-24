@@ -13,7 +13,7 @@ class App extends Component {
 
   state = {
     notes: [],
-    folders: [],
+    folders: []
   }
 
   componentDidMount() {

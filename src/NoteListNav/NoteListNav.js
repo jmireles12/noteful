@@ -10,7 +10,7 @@ export default class NoteListNav extends React.Component {
     static contextType = Context;
 
     render() {
-        const { folders=[], notes=[] } = Context
+        const { folders=[], notes=[] } = this.context
         return (
             <div className='NoteListNav'>
                 <ul className='NoteListNav__list'>

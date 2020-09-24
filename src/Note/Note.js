@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import './Note.css'
 import Context from '../context';
 import config from '../config';
 import Moment from 'moment';
+import './Note.css'
 
 export default class Note extends React.Component {
     static defaultProps ={
@@ -37,6 +37,7 @@ export default class Note extends React.Component {
     }
     
     render() {
+       
         const { name, id, modified } = this.props
         Moment.locale('en');
         const dt = modified;

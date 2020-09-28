@@ -1,11 +1,13 @@
 import React from 'react'
 import Context from '../context';
+import AddFolder from '../AddNote/AddNote';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import CircleButton from '../CircleButton/CircleButton'
 import { findNote, findFolder } from '../notes-helpers'
 import './NotePageNav.css'
 
 export default class NotePageNav extends React.Component {
+
   static defaultProps = {
     history: {
       goBack: () => { }
@@ -33,11 +35,15 @@ export default class NotePageNav extends React.Component {
             <br />
             Back
           </CircleButton>
-          {folder && (
+          <AddFolder
+            handleAdd={folder => this.addFolder(folder)}
+          />
+        {folder && (
             <h3 className='NotePageNav__folder-name'>
               {folder.name}
             </h3>
           )}
+          
         </div>
     )
   }

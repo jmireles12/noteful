@@ -5,6 +5,8 @@ import NoteListNav from './NoteListNav/NoteListNav';
 import NotePageNav from './NotePageNav/NotePageNav';
 import NoteListMain from './NoteListMain/NoteListMain';
 import NotePageMain from './NotePageMain/NotePageMain';
+import AddFolder from './AddNote/AddNote';
+import AddNote from './AddFolder/AddFolder';
 import Context from './context';
 import config from './config';
 import './App.css';
@@ -37,10 +39,53 @@ class App extends Component {
     })
   }
 
+  addFolder = folder => {
+    this.setState({
+      folders: [...this.state.folders, folder],
+    })
+  }
+
+  addNote = note => {
+    this.setState({
+      notes: [...this.state.notes, note],
+    })
+  }
+
   handleDeleteNote = noteId => {
     this.setState({
       notes: this.state.notes.filter(note => note.id !== noteId)
     })
+  }
+
+  setFolders = folders => {
+    this.setState({
+      folders,
+      error: null
+    })
+  }
+
+  setNotes = notes => {
+    this.setState({
+      notes,
+      error: null
+    })
+  }
+
+  getFolders = () => {
+    fetch(config.API_FOLDERS, {
+      method: 'GET',
+      headers: {
+        'content-type' : 'application/json'
+      }
+    })
+    .then(res => {
+      if(!res.ok) {
+        throw new Error(res.status);
+      }
+      return res.json();
+    })
+    .then(this.setFolders)
+    .catch(error => this.setState({ foldersError: error }))
   }
 
   renderNavRoutes() {
@@ -55,8 +100,8 @@ class App extends Component {
           />
         ))}
         <Route path='/note/:noteId' component={NotePageNav} />
-        <Route path='/add-folder' component={NotePageNav} />
-        <Route path='/add-note' component={NotePageNav} />
+        <Route path='/add-folder' component={AddFolder} />
+        <Route path='/add-note' component={AddNote} />
       </>
     )
   }

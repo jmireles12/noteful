@@ -13,11 +13,13 @@
     "date-fns-tz": "^1.0.10",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.5",
+    "enzyme-to-json": "^3.6.1",
     "moment": "^2.28.0",
     "npm": "^7.0.13",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-moment": "^1.0.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.0",
     "typeface-roboto": "0.0.75"

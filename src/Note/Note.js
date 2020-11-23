@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { format, parseISO } from 'date-fns'
+import Moment from 'react-moment'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Context from '../context'
 import config from '../config'
@@ -60,7 +60,7 @@ export default class Note extends React.Component {
             Modified
             {' '}
             <span className='Date'>
-              {format(parseISO(modified), 'Do MMM yyyy')}
+              <Moment>{modified}</Moment>
             </span>
           </div>
         </div>

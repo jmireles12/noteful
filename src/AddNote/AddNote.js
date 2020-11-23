@@ -1,168 +1,84 @@
-import React, { Component } from 'react';
-import Context from '../context';
-import config from '../config';
-import ValidationError from '../ValidationError';
+import React, { Component } from 'react'
+import NotefulForm from '../NotefulForm/NotefulForm'
+import Context from '../context'
+import config from '../config'
+import './AddNote.css'
 
 export default class AddNote extends Component {
-    static contextType = Context;
+  static defaultProps = {
+    history: {
+      push: () => { }
+    },
+  }
+  static contextType = Context;
 
-    state = {
-        appError: null,
-        formValid: false,
-        errorCount: null,
-        name: '',
-        folderId: '',
-        content: '',
-        errors: {
-            folderId:
-                'You must select a folder',
-            name: 'You must enter a note title',
-            content: 'You must enter a description'
-        }
+  handleSubmit = e => {
+    e.preventDefault()
+    const newNote = {
+      name: e.target['note-name'].value,
+      content: e.target['note-content'].value,
+      folderId: e.target['note-folder-id'].value,
+      modified: new Date(),
     }
+    fetch(`${config.API_ENDPOINT}/notes`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(newNote),
+    })
+      .then(res => {
+        if (!res.ok)
+          return res.json().then(e => Promise.reject(e))
+        return res.json()
+      })
+      .then(note => {
+        this.context.addNote(note)
+        this.props.history.push(`/folder/${note.folderId}`)
+      })
+      .catch(error => {
+        console.error({ error })
+      })
+  }
 
-    updateErrorCount = () => {
-        let errors = this.state.errors;
-        let count = 0;
-
-        Object.values(errors).forEach(val => {
-            if (val.length > 0) {
-                count++;
-            }
-        });
-        this.setState({ errorCount: count });
-        let valid = count === 0 ? true : false;
-        this.setState({ formValid: valid });
-    };
-
-    updateFolderId(folderId) {
-        this.setState({ folderId: { value: folderId, touched: true } });
-    }
-
-    validateEntry = (name, value) => {
-        let err = '';
-        if (name === 'name') {
-            if (value.length === 0) {
-                return 'Name is required.'
-            }
-            else if (name.length < 3) {
-                return "Name must be at least 3 characters long";
-            }
-        }
-        const { errors } = { ...this.state };
-        errors[name] = err;
-        this.setState({ errors });
-    }
-
-    handleChange = e => {
-        const { name, value } = e.target;
-        this.setState(
-            { [name]: value.trim() },
-        );
-        this.validateEntry(name, value.trim());
-        this.updateErrorCount();
-    }
-
-    handleSubmit = (e) => {
-        e.preventDefault();
-
-        if (this.state.errorCount > 0) return;
-
-        const { name, folderId, content } = e.target;
-        const note = {
-            note_name: name.value,
-            folder_id: folderId.value,
-            content: content.value,
-            modified: new Date()
-        };
-        this.setState({ appError: null });
-
-        fetch(config.API_NOTES, {
-            method: 'POST',
-            body: JSON.stringify(note),
-            headers: {
-                'content-type': 'application/json'
-            }
-        })
-            .then(res => {
-                if (!res.ok) {
-                    return res.json().then(error => {
-                        throw error;
-                    });
-                }
-                return res.json();
-            })
-            .then(data => {
-                name.value = '';
-                content.value = '';
-                folderId.value = '';
-                this.context.addNote(data);
-                this.setState({ data });
-                this.props.history.push('/', data);
-            })
-            .catch(error => {
-                this.setState({ appError: error });
-            });
-    };
-
-    render() {
-        const { errors } = this.state;
-        const folders = this.context.folders;
-        if (this.state.appError) {
-            return <p className="error">{this.state.appError}</p>;
-        }
-
-        return (
-            <form className="add-note" onSubmit={this.handleSubmit}>
-                <legend>
-                    <h3>Add Note</h3>
-                </legend>
-                <label htmlFor="name"><h4>Note Name</h4></label>
-                <input
-                    type="text"
-                    className="add-note__name"
-                    name="name"
-                    id="name"
-                    defaultValue=""
-                    onChange={this.handleChange}
-                />
-
-                {errors.name.length > 0 && (
-                    <ValidationError message={errors.name} />)}
-                <label htmlFor="content"><h4>Note Content</h4></label>
-                <input
-                    type="text"
-                    className="add-note__content"
-                    name="content"
-                    id="content"
-                    defaultValue=""
-                    onChange={this.handleChange}
-                />
-                <select
-                    id="folderId"
-                    name="folderId"
-                    value={this.state.folderId}
-                    onChange={this.handleChange}
-                >
-                    <option value="">Select a folder</option>
-                    {folders.map(folder => (<option key={folder.id} value={folder.id}>{folder.folder_name}</option>))}
-                </select>
-                <button
-                    type="submit"
-                    id="submit-btn"
-                    disabled={
-                        this.state.formValid === false
-                    }
-                >Submit
-                    </button>
-
-                {this.state.errorCount !== null ? (
-                    <p className="form-status">
-                        Form is {this.state.formValid ? 'complete' : 'incomplete'}
-                    </p>
-                ) : null}
-
-            </form>
-        );
-    }
+  render() {
+    const { folders=[] } = this.context
+    return (
+      <section className='AddNote'>
+        <h2>Create a note</h2>
+        <NotefulForm onSubmit={this.handleSubmit}>
+          <div className='field'>
+            <label htmlFor='note-name-input'>
+              Name
+            </label>
+            <input type='text' id='note-name-input' name='note-name' />
+          </div>
+          <div className='field'>
+            <label htmlFor='note-content-input'>
+              Content
+            </label>
+            <textarea id='note-content-input' name='note-content' />
+          </div>
+          <div className='field'>
+            <label htmlFor='note-folder-select'>
+              Folder
+            </label>
+            <select id='note-folder-select' name='note-folder-id'>
+              <option value={null}>...</option>
+              {folders.map(folder =>
+                <option key={folder.id} value={folder.id}>
+                  {folder.name}
+                </option>
+              )}
+            </select>
+          </div>
+          <div className='buttons'>
+            <button type='submit'>
+              Add note
+            </button>
+          </div>
+        </NotefulForm>
+      </section>
+    )
+  }
 }
